@@ -11,7 +11,7 @@
         android:theme="@style/Theme.Android_Notification_Example">
 
         <receiver
-            android:name=".DismissNotiReceiver"
+            android:name=".ReplyNotiReceiver"
             android:enabled="true"
             android:exported="true" />
 

@@ -1,9 +1,6 @@
 package com.example.android_notification_example
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
@@ -16,7 +13,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val CHANNEL_ID = "channel_id"
         const val NOTIFICATION_GROUP_KEY = "notification_group_key"
-        var notificationID = 100
+        var notificationID = 0
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -65,21 +62,22 @@ class MainActivity : AppCompatActivity() {
                 this,
                 0,
                 Intent(this, MainActivity::class.java).apply { putExtra("notification_id", notificationID) },
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_ONE_SHOT
         )
 
-        val dismissPendingIntent = PendingIntent.getBroadcast(
+        val replyPendingIntent = PendingIntent.getBroadcast(
                 this,
-                0,
-                Intent(this, DismissNotiReceiver::class.java).apply { putExtra("notification_id", notificationID) },
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                notificationID,
+                Intent(this, ReplyNotiReceiver::class.java).apply { putExtra("notification_id", notificationID) },
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_ONE_SHOT
         )
 
         val action = Notification.Action.Builder(
                 Icon.createWithResource(this, android.R.drawable.ic_dialog_info),
-                "Dismiss",
-                dismissPendingIntent
-        ).build()
+                "Reply",
+                replyPendingIntent)
+                .addRemoteInput(RemoteInput.Builder("text_reply_key").setLabel("Enter your reply here").build())
+                .build()
 
         val notification = Notification.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
